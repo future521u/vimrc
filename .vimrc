@@ -1,4 +1,69 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"Vim plugin manager settings
+"Vundle is short for Vim bundle and is a Vim plugin manager.
+"Vundle allows you to:
+"1)keep track of and configure your plugins right in the .vimrc
+"2)install configured plugins (a.k.a. scripts/bundle)
+"3)update configured plugins
+"4)search by name all available Vim scripts
+"5)clean unused plugins up
+"6)run the above actions in a single keypress with interactive mode
+"Vundle automatically:
+"1)manages the runtime path of your installed scripts
+"2)regenerates help tags after installing and updating
+"
+"Install Plugins:
+"1)Launch vim and run :PluginInstall
+"2)To install from command line: vim +PluginInstall +qall
+"3)(optional) For those using the fish shell: add set shell=/bin/bash to your .vimrc
+"Docs:
+"1)See the :h vundle Vimdoc for more details.
+"
+"Vundle.vim: https://github.com/VundleVim/Vundle.vim
+"vim-scripts: https://vim-scripts.org/vim/scripts/html
+"
+"Put this at the top of your .vimrc to use Vundle. Remove plugins you don't need, they are for illustration purposes.
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set nocompatible              " be iMproved, required
+filetype off                  " required
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+" The following are examples of different formats supported.
+" Keep Plugin commands between vundle#begin/end.
+" plugin on GitHub repo
+Plugin 'tpope/vim-fugitive'
+" plugin from http://vim-scripts.org/vim/scripts.html
+" Plugin 'L9'
+" Git plugin not hosted on GitHub
+Plugin 'git://git.wincent.com/command-t.git'
+" git repos on your local machine (i.e. when working on your own plugin)
+Plugin 'file:///home/gmarik/path/to/plugin'
+" The sparkup vim script is in a subdirectory of this repo called vim.
+" Pass the path to set the runtimepath properly.
+Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+" Install L9 and avoid a Naming conflict if you've already installed a
+" different version somewhere else.
+" Plugin 'ascenator/L9', {'name': 'newL9'}
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "key command
 "<k0>-<k9> small key board from 0 to 9
 "<S-...> Shift+key
@@ -15,6 +80,7 @@
 "<unique>
 "<Leader> and variable mapleader
 "<LocalLeader> and variable maplocalleader
+"Copy/Paste/Cut-off/select-all
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <leader>w :w!<cr>
 nmap <leader>f :find<cr>
@@ -32,14 +98,79 @@ nnoremap <C-F2> :vert diffsplit
 noremap <M-F2> :tabnew .<CR>
 "list the current directory files
 noremap <F3>l :tabnew .<CR>
-"open the tree file directory
-map <C-F3> \be
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" NerdTree setting
+" 1)install NERDTree: https://github.com/scrooloose/nerdtree
+" 2)install Share plugin vim-nerdtree-tabs: https://github.com/jistr/vim-nerdtree-tabs
+" 3)install nerdtree-git-plugin: https://github.com/Xuyuanp/nerdtree-git-plugin
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"vim-nerdtree-tabs settings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"display line number
+let NERDTreeShowLineNumbers=1
+let NERDTreeAutoCenter=1
+"whether to display hidden files
+let NERDTreeShowHidden=1
+"set the window width
+let NERDTreeWinSize=31
+"share NERDTree when terminal starts vim
+let g:nerdtree_tabs_open_on_console_startup=1
+"ignore the display of the following file
+let NERDTreeIgnore=['\.pyc','~$','\.swp']
+"display bookmark list
+let NERDTreeShowBookmarks=1
+"turn off NERDTree shortcut key
+map <leader>t :NERDTreeToggle<CR>
 "open/close nerdtree by F3
-map <F3> :NERDTreeMirror <CR>
-map <F3> :NERDTreeToggle<CR>
+"map <F3> :NERDTreeMirror <CR>
+"map <F3> :NERDTreeToggle<CR>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"nerdtree-git-plugin settings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"let g:NERDTreeIndicatorMapCustom = {
+"    \ "Modified"  : "?",
+"    \ "Staged"    : "?",
+"    \ "Untracked" : "?",
+"    \ "Renamed"   : "?",
+"    \ "Unmerged"  : "¨T",
+"    \ "Deleted"   : "?",
+"    \ "Dirty"     : "?",
+"    \ "Clean"     : "??",
+"    \ "Unknown"   : "?"
+"    \ }
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" backgroud color setting
+" ctrlp.vim settings
+" Full path fuzzy file,buffer,mru,tag,... finder for Vim
+"1)Written in pure Vimscript for MacVim, gVim and Vim 7.0+.
+"2)Full support for Vim's regexp as search patterns.
+"3)Built-in Most Recently Used (MRU) files monitoring.
+"4)Built-in project's root finder.
+"5)Open multiple files at once.
+"6)Create new files and directories.
+"7)Extensible.
+"https://github.com/kien/ctrlp.vim
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"YouCompletMe settings
+"YouCompleteMe is a fast, as-you-type, fuzzy-search code completion engine for Vim. It has several completion engines:
+"1)an identifier-based engine that works with every programming language,
+"2)a Clang-based engine that provides native semantic code completion for C/C++/Objective-C/Objective-C++ (from now on referred to as "the C-family languages"),
+"3)a Jedi-based completion engine for Python 2 and 3 (using the JediHTTP wrapper),
+"4)an OmniSharp-based completion engine for C#,
+"5)a combination of Gocode and Godef semantic engines for Go,
+"6)a TSServer-based completion engine for TypeScript,
+"7)a Tern-based completion engine for JavaScript,
+"8)a racer-based completion engine for Rust,
+"9)and an omnifunc-based completer that uses data from Vim's omnicomplete system to provide semantic completions for many other languages (Ruby, PHP etc.).
+"https://github.com/Valloric/YouCompleteMe
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" backgroud color settings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 colorscheme desert
 highlight LineNr cterm=bold ctermfg=red  
@@ -55,9 +186,8 @@ highlight pythonInclude cterm=bold ctermfg=lightblue
 highlight javaScriptStringS ctermfg=gray   
 highlight String ctermfg=gray  
 hi Search cterm=NONE ctermfg=darkred ctermbg=yellow cterm=reverse  
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" practical setting
+" practical settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "set autoread  "automatically load when the file is changed
 "autocmd FileType c,cpp map <buffer> <leader><space> :w<cr>:make<cr>  "quickfix mode
@@ -120,7 +250,6 @@ set backspace=2  "make keyboard backspace normally handle indent,eol,start and s
 set showmatch  "highlight the matched brackets
 set matchtime=1  "the time of matching brackets(a unit of 1/10)
 "au BufRead,BufNewFile * setfiletype txt "highlighting common txt files(requiring .vim scripts)
-
 "set shortmess=atI 
 "winpos 5 5  "set the windows position
 "set lines=40 columns=155  "set the windows size
@@ -156,7 +285,6 @@ set matchtime=1  "the time of matching brackets(a unit of 1/10)
 set showmode   
 set smartindent    
 set expandtab  
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "file .c,.h,.sh,.java files,automatically insert the file header
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -188,9 +316,6 @@ set expandtab
 "        call append(line(".")+7, "")
 "    autocmd BufNewFile * normal G "automatically locate the file at the end of the file after the new file is built
 "endfunc
-
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "compile and run by F5 for c,c++
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -210,7 +335,6 @@ set expandtab
 "        :! ./%
 "    endif
 "endfunc
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "debug for c,c++
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -220,8 +344,6 @@ set expandtab
 "    exec "!g++ % -g -o %<"
 "    exec "!gdb ./%<"
 "endfunc
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "auto-complete
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -242,10 +364,8 @@ set expandtab
 "endfunction
 "filetype plugin indent on
 "set completeopt=longest,menu  "the file type detection is open,it can only be used with intelligent completion
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"cscope setting
+"cscope settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("cscope")
 	set csprg=/usr/bin/cscope
@@ -263,7 +383,6 @@ if has("cscope")
 	endif
 	set csverb
 endif
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "Add a new cscope database/connection
 "
@@ -276,7 +395,6 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <F4> :cs add ./cscope.out <CR><CR><CR> :cs reset<CR>
 imap <F4> <ESC> :cs add ./cscope.out <CR><CR><CR> :cs reset<CR>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "	help : Show a brief synopsis.
 "		USAGE :cs help
@@ -287,7 +405,6 @@ nmap <C-h> :cs help<CR>
 "	    USAGE   :cs kill {num|partial_name}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <C-k> :cs kill<CR>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "    reset : Reinit all cscope connections.
 "	    USAGE   :cs reset
@@ -301,7 +418,6 @@ nmap <C-w> :cs show<CR>
 "to :cstag with the following command: >
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <C-_> :cstag <C-R>=expand("<cword>")<CR><CR>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "A couple of very commonly used cscope queries (using ":cs find") is to
 "find all functions calling a certain function and to find all occurrences
@@ -310,7 +426,6 @@ map <C-_> :cstag <C-R>=expand("<cword>")<CR><CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map g<C-]> :cs find 3 <C-R>=expand("<cword>")<CR><CR>
 map g<C-\> :cs find 0 <C-R>=expand("<cword>")<CR><CR>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 0 or s: Find this C symbol
 " 1 or g: Find this definition
@@ -337,7 +452,6 @@ nmap <C-Space>e :scs find e <C-R>=expand("<cword>")<CR><CR>
 nmap <C-Space>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
 nmap <C-Space>i :scs find i <C-R>=expand("<cfile>")<CR>$<CR>
 nmap <C-Space>d :scs find d <C-R>=expand("<cword>")<CR><CR>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Hitting CTRL-space *twice* before the search type does a vertical
 " split instead of a horizontal one
@@ -350,7 +464,6 @@ nmap <C-]>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
 nmap <C-]>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
 nmap <C-]>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
 nmap <C-]>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
-
 "nmap fs :lcs find s <C-R>=expand("<cword>")<CR><CR><C-o>:lw<CR>
 "nmap fg :lcs find g <C-R>=expand("<cword>")<CR><CR><C-o>:lw<CR>
 "nmap fc :lcs find c <C-R>=expand("<cword>")<CR><CR><C-o>:lw<CR>
@@ -359,14 +472,12 @@ nmap <C-]>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
 "nmap fe :lcs find e <C-R>=expand("<cword>")<CR><CR><C-o>:lw<CR>
 "nmap fi :lcs find i ^<C-R>=expand("<cfile>")<CR>$<CR><C-o>:lw<CR>
 "nmap fd :lcs find d <C-R>=expand("<cword>")<CR><CR><C-o>:lw<CR>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "addupdate the shortcut key for automatically updating.
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <F5> :!find . -iname '*.c' -o iname '*.cpp' -o iname '*.h' -o iname '*.h' -o iname '*.hpp' > cscope.files<CR>
 	\ :!cscope -b -i cscope.files -f cscope.out<CR>
 	\ :cs reset<CR>    
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "CTags setting
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -380,9 +491,8 @@ set tags=tags
 "add current directory's generated tags file
 set tags+=./tags 
 set autochdir
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"tag list(ctags)
+"tag list(ctags) settings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let Tlist_Ctags_Cmd = '/usr/bin/ctags'  "set ctags path
 let Tlist_Auto_Open = 1  "open taglist window after starting VIM
@@ -401,7 +511,6 @@ let Tlist_Auto_Update = 1 "automatically update
 "nnoremap <silent><Leader>bt :!~/Myfiles/Tool/sh/ctags/hittags.sh<CR>
 "highlight the label
 "nnoremap <silent><Leader>ht :so tags.vim<CR>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "the general setting of the minibufexpl plug-in
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -413,9 +522,9 @@ let Tlist_Auto_Update = 1 "automatically update
 noremap<F6> :!ctags -R<CR> 
 "set open/close keyboard shortcut of taglist to F8
 noremap<F8> :TlistToggle<CR> 
-
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "-- omnicppcomplete setting --
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " press F3 to automatically complete the code 
 imap <F3> <C-X><C-O>
 "press F2 to complete the key words included in the header file
