@@ -476,7 +476,16 @@ set shell=/bin/bash
     " }
 
     " Ctags {
-        set tags=./tags;
+        "-- QuickFix setting --
+        "--ctags setting--
+
+        " 按下F5重新生成tag文件，并更新taglist
+        map :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q . :TlistUpdate
+        imap :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q . :TlistUpdate
+        set tags=tags
+        set tags+=./tags "add current directory's generated tags file
+        set tags+=/usr/include/c++/tags
+        set autochdir
         " Make tags placed in .git/tags file available in all levels of a repository
         let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
         if gitroot != ''
@@ -485,66 +494,77 @@ set shell=/bin/bash
     " }
 
     " cscope {
-        " 用Cscope自己的话说 - "你可以把它当做是超过频的ctags"
-        if has("cscope")
-            " 设定可以使用 quickfix 窗口来查看 cscope 结果
-            set cscopequickfix=s-,c-,d-,i-,t-,e-
-            " 使支持用 Ctrl+]  和 Ctrl+t 快捷键在代码间跳转
-            set cscopetag
-            " 如果你想反向搜索顺序设置为1
-            set csto=0
-            " 在当前目录中添加任何数据库
-            " 注释掉(vim启动提示错误：重复的 cscope 数据库未被加入) ++
-            " 原因是：/etc/vimrc 中已经有如下定义
-            " if filereadable("cscope.out")
-            "    cs add cscope.out
-            " 否则添加数据库环境中所指出的
-            " elseif $CSCOPE_DB != ""
-            "    cs add $CSCOPE_DB
-            " endif
-            " 注释掉(vim启动提示错误：重复的 cscope 数据库未被加入) --
-
-            " add for autoload cscope +++
-            function! LoadCscope()
-                let db = findfile("cscope.out", ".;")
-                if (!empty(db))
-                let path = strpart(db, 0, match(db, "/cscope.out$"))
-                set nocscopeverbose " suppress 'duplicate connection' error
-                exe "cs add " . db . " " . path
-                set cscopeverbose
+        autocmd BufEnter * lcd %:p:h
+        map <F12> :call Do_CsTag()<CR>
+        nmap <C-@>s :cs find s <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        nmap <C-@>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-@>c :cs find c <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        nmap <C-@>t :cs find t <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        nmap <C-@>e :cs find e <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        nmap <C-@>f :cs find f <C-R>=expand("<cfile>")<CR><CR>:copen<CR>
+        nmap <C-@>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:copen<CR>
+        nmap <C-@>d :cs find d <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        function Do_CsTag()
+            let dir = getcwd()
+            if filereadable("tags")
+                if(g:iswindows==1)
+                    let tagsdeleted=delete(dir."\\"."tags")
+                else
+                    let tagsdeleted=delete("./"."tags")
                 endif
-                endfunction
-            au BufEnter /* call LoadCscope()
-            " add for autoload cscope ---
-
-            set cscopeverbose
-            " 快捷键设置
-            " s: 查找本 C 符号
-            nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
-            " g: 查找本定义
-            nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-            " c: 查找调用本函数的函数
-            nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
-            " t: 查找对其的赋值
-            nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
-            " e: 查找本 egrep 模式
-            nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
-            " f: 查找本文件
-            nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
-            " i: 查找包含本文件的文件
-            nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-            " d: 查找本函数调用的函数
-            nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
-
-            " 在.bashrc中增加如下定义，这样：在终端的任何目录下，输入"haha"就可以生成ctags&cscope
-            "alias haha='ctags_cscope_func'
-            "ctags_cscope_func() {
-                "ctags -R --c++-kinds=+px --fields=+aiKSz --extra=+q .
-                "find . -name "*.h" -o -name "*.hh" -o -name "*.hpp" -o -name "*.hxx" -o -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" -o -name "*.java" > cscope.files
-                "cscope -Rbq -i cscope.files
-                "rm -rf cscope.files
-            "}
-        endif
+                if(tagsdeleted!=0)
+                    echohl WarningMsg | echo "Fail to do tags! I cannot delete the tags" | echohl None
+                    return
+                endif
+            endif
+            if has("cscope")
+                " 设定可以使用 quickfix 窗口来查看 cscope 结果
+                set cscopequickfix=s-,c-,d-,i-,t-,e-
+                " 使支持用 Ctrl+]  和 Ctrl+t 快捷键在代码间跳转
+                set cscopetag
+                " 如果你想反向搜索顺序设置为1
+                set csto=0
+                silent! execute "cs kill -1"
+            endif
+            if filereadable("cscope.files")
+                if(g:iswindows==1)
+                    let csfilesdeleted=delete(dir."\\"."cscope.files")
+                else
+                    let csfilesdeleted=delete("./"."cscope.files")
+                endif
+                if(csfilesdeleted!=0)
+                    echohl WarningMsg | echo "Fail to do cscope! I cannot delete the cscope.files" | echohl None
+                    return
+                endif
+            endif
+            if filereadable("cscope.out")
+                if(g:iswindows==1)
+                    let csoutdeleted=delete(dir."\\"."cscope.out")
+                else
+                    let csoutdeleted=delete("./"."cscope.out")
+                endif
+                if(csoutdeleted!=0)
+                    echohl WarningMsg | echo "Fail to do cscope! I cannot delete the cscope.out" | echohl None
+                    return
+                endif
+            endif
+            if(executable('ctags'))
+                "silent! execute "!ctags -R --c-types=+p --fields=+S *"
+                silent! execute "!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q ."
+            endif
+            if(executable('cscope') && has("cscope") )
+                if(g:iswindows!=1)
+                    silent! execute "!find . -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cs' > cscope.files"
+                else
+                    silent! execute "!dir /s/b *.c,*.cpp,*.h,*.java,*.cs >> cscope.files"
+                endif
+                silent! execute "!cscope -b"
+                execute "normal :"
+                if filereadable("cscope.out")
+                execute "cs add cscope.out"
+                endif
+            endif
+        endfunction
     " }
 
     " NerdTree {
@@ -589,18 +609,23 @@ set shell=/bin/bash
 
     " TagList {
         if isdirectory(expand("~/.vim/bundle/taglist.vim/"))
+            "进行Tlist的设置
+            "TlistUpdate可以更新tags
+            map <F3> :silent! Tlist<CR> "按下F3就可以呼出了
             nmap <leader>tl :TagbarClose<CR>:Tlist<CR>
+            let Tlist_Use_Right_Window=1 "让窗口显示在右边，缺省在左侧
+            let Tlist_Show_One_File=0 "让taglist可以同时展示多个文件的函数列表，如果只显示当前文件的tags，设置为1
+            let Tlist_File_Fold_Auto_Close=1 "非当前文件，函数列表折叠隐藏
+            let Tlist_Exit_OnlyWindow=1 "当taglist是最后一个分割窗口时，自动推出vim
+            let Tlist_Process_File_Always=0 "是否一直处理tags.1:处理;0:不处理。不是一直实时更新tags，因为没有必要
+            let Tlist_Inc_Winwidth=0
             let Tlist_Ctags_Cmd = '/usr/bin/ctags'
-            let Tlist_Show_One_File=1                   " 只显示当前文件的tags
             let Tlist_Auto_Update=1                     " Automatically update the taglist to include newly edited files.
-            let Tlist_File_Fold_Auto_Close=1            " 非当前文件，函数列表折叠隐藏
             "let Tlist_Enable_Fold_Column=0             " 使taglist插件不显示左边的折叠行
-            let Tlist_Exit_OnlyWindow=1                 " 如果Taglist窗口是最后一个窗口则退出Vim
             "let Tlist_File_Fold_Auto_Close=1           " 自动折叠
             let Tlist_Show_Menu=1                       " 显示taglist菜单
             "let Tlist_Auto_Open=1                      " 启动vim自动打开taglist
             "let Tlist_WinWidth=30                      " 设置窗口宽度
-            "let Tlist_Use_Right_Window=1               " 把taglist窗口放在屏幕的右侧，缺省在左侧
         endif
     " }
 
