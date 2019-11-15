@@ -486,6 +486,10 @@ set shell=/bin/bash
         set tags+=./tags "add current directory's generated tags file
         set tags+=/usr/include/c++/tags
         set autochdir
+        "update the keyboard shortcut setting of the ctags tag file
+        noremap<F7> :!ctags -R<CR> 
+        "set open/close keyboard shortcut of taglist to F8
+        noremap<F8> :TlistToggle<CR>
         " Make tags placed in .git/tags file available in all levels of a repository
         let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
         if gitroot != ''
@@ -495,15 +499,16 @@ set shell=/bin/bash
 
     " cscope {
         autocmd BufEnter * lcd %:p:h
+        nmap <C-/>s :cs find s <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        nmap <C-/>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-/>c :cs find c <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        nmap <C-/>t :cs find t <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        nmap <C-/>e :cs find e <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        nmap <C-/>f :cs find f <C-R>=expand("<cfile>")<CR><CR>:copen<CR>
+        nmap <C-/>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:copen<CR>
+        nmap <C-/>d :cs find d <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+
         map <F12> :call Do_CsTag()<CR>
-        nmap <C-@>s :cs find s <C-R>=expand("<cword>")<CR><CR>:copen<CR>
-        nmap <C-@>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-@>c :cs find c <C-R>=expand("<cword>")<CR><CR>:copen<CR>
-        nmap <C-@>t :cs find t <C-R>=expand("<cword>")<CR><CR>:copen<CR>
-        nmap <C-@>e :cs find e <C-R>=expand("<cword>")<CR><CR>:copen<CR>
-        nmap <C-@>f :cs find f <C-R>=expand("<cfile>")<CR><CR>:copen<CR>
-        nmap <C-@>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:copen<CR>
-        nmap <C-@>d :cs find d <C-R>=expand("<cword>")<CR><CR>:copen<CR>
         function Do_CsTag()
             let dir = getcwd()
             if filereadable("tags")
