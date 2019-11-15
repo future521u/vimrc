@@ -334,55 +334,41 @@ set shell=/bin/bash
         endif
     " }
 
+    " Ctags {
+        "-- QuickFix setting --
+        "--ctags setting--
+        set tags=tags
+        set tags+=./tags "add current directory's generated tags file
+        set tags+=/usr/include/c++/tags
+        " 按下F12重新生成tag文件，并更新taglist
+        map <F12> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
+        imap <F12> <ESC>:!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
+
+        " Make tags placed in .git/tags file available in all levels of a repository
+        let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
+        if gitroot != ''
+            let &tags = &tags . ',' . gitroot . '/.git/tags'
+        endif
+    " }
+
     " cscope {
-        autocmd BufEnter * lcd %:p:h
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-        "addupdate the shortcut key for automatically updating.
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-        noremap <F6> :!find . -iname '*.c' -o iname '*.cpp' -o iname '*.h' -o iname '*.h' -o iname '*.hpp' > cscope.files<CR>
-        	\ :!cscope -b -i cscope.files -f cscope.out<CR>
-        	\ :cs reset<CR>
+        if has("cscope")
+        	set csprg=/usr/bin/cscope
+        	set csto=1
+        	set cst
+        	set nocsverb
+        	set csre
+        	set cscopequickfix=g-,s-,c-,d-,i-,t-,e-
+        	" add any database in current directory
+        	if filereadable("cscope.out")
+        		cs add cscope.out
+        	" else add database pointed to by environment
+        	elseif $CSCOPE_DB != ""
+        		cs add $CSCOPE_DB
+        	endif
+        	set csverb
+        endif
 
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-        " 0 or s: Find this C symbol
-        " 1 or g: Find this definition
-        " 3 or c: Find functions calling this function
-        " 4 or t: Find this text string
-        " 5 or e: Find this egrep pattern
-        " 6 or f: Find this file
-        " 7 or i: Find files #including this file
-        " 2 or d: Find functions called by this function
-        "These mappings for Ctrl-] (right bracket) and Ctrl-\ (backslash) allow you to
-        "place your cursor over the function name or C symbol and quickly query cscope
-        "for any matches.
-        "Or you may use the following scheme, inspired by Vim/Cscope tutorial from
-        "Cscope Home Page (http://cscope.sourceforge.net/): >
-        " Using 'CTRL-spacebar' then a search type makes the vim window
-        " split horizontally, with search result displayed in
-        " the new window.
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-        nmap <C-Space>s :scs find s <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-Space>g :scs find g <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-Space>c :scs find c <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-Space>t :scs find t <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-Space>e :scs find e <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-Space>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
-        nmap <C-Space>i :scs find i <C-R>=expand("<cfile>")<CR>$<CR>
-        nmap <C-Space>d :scs find d <C-R>=expand("<cword>")<CR><CR>
-
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-        " Hitting CTRL-space *twice* before the search type does a vertical
-        " split instead of a horizontal one
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-        nmap <C-]>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-]>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-]>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-]>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-]>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-]>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
-        nmap <C-]>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-        nmap <C-]>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
-        map <F12> :call Do_CsTag()<CR>
         function Do_CsTag()
             let dir = getcwd()
             if filereadable("tags")
@@ -433,9 +419,9 @@ set shell=/bin/bash
             endif
             if(executable('cscope') && has("cscope") )
                 if(g:iswindows!=1)
-                    silent! execute "!find . -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cs' > cscope.files"
+                    silent! execute "!find . -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cs' -name '*.asm' -o '*.s' -o '*.S'> cscope.files"
                 else
-                    silent! execute "!dir /s/b *.c,*.cpp,*.h,*.java,*.cs >> cscope.files"
+                    silent! execute "!dir /s/b *.c,*.cpp,*.h,*.java,*.cs,*.asm,*.s,*.S>> cscope.files"
                 endif
                 silent! execute "!cscope -b"
                 execute "normal :"
@@ -444,13 +430,87 @@ set shell=/bin/bash
                 endif
             endif
         endfunction
+
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        " 0 or s: Find this C symbol
+        " 1 or g: Find this definition
+        " 3 or c: Find functions calling this function
+        " 4 or t: Find this text string
+        " 5 or e: Find this egrep pattern
+        " 6 or f: Find this file
+        " 7 or i: Find files #including this file
+        " 2 or d: Find functions called by this function
+        "These mappings for Ctrl-] (right bracket) and Ctrl-\ (backslash) allow you to
+        "place your cursor over the function name or C symbol and quickly query cscope
+        "for any matches.
+        "Or you may use the following scheme, inspired by Vim/Cscope tutorial from
+        "Cscope Home Page (http://cscope.sourceforge.net/): >
+        " Using 'CTRL-spacebar' then a search type makes the vim window
+        " split horizontally, with search result displayed in
+        " the new window.
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        nmap <C-Space>s :scs find s <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>g :scs find g <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>c :scs find c <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>t :scs find t <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>e :scs find e <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
+        nmap <C-Space>i :scs find i <C-R>=expand("<cfile>")<CR>$<CR>
+        nmap <C-Space>d :scs find d <C-R>=expand("<cword>")<CR><CR>
+
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        " Hitting CTRL-space *twice* before the search type does a vertical
+        " split instead of a horizontal one
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        nmap <C-]>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
+        nmap <C-]>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+        nmap <C-]>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
+
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        "add update the shortcut key for automatically updating.
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        noremap <F11> :!find . -iname '*.c' -o iname '*.cpp' -o iname '*.h' -o iname '*.h' -o iname '*.hpp' > cscope.files<CR>
+        	\ :!cscope -b -i cscope.files -f cscope.out<CR>
+        	\ :cs reset<CR>
+
+        map <F10> :call Do_CsTag()<CR>
+
+    " }
+
+    " TagList {
+        if isdirectory(expand("~/.vim/bundle/taglist.vim/"))
+            "进行Tlist的设置
+            "set open/close keyboard shortcut of taglist to F9
+            "noremap<F9> :TlistToggle<CR>
+            "TlistUpdate可以更新tags
+            "map <F9> :silent! Tlist<CR> "按下<F9>就可以呼出了
+
+            nmap <leader>tl :TagbarClose<CR>:Tlist<CR>
+            let Tlist_Use_Right_Window=1 "让窗口显示在右边，缺省在左侧
+            let Tlist_Show_One_File=0 "让taglist可以同时展示多个文件的函数列表，如果只显示当前文件的tags，设置为1
+            let Tlist_File_Fold_Auto_Close=1 "非当前文件，函数列表折叠隐藏
+            let Tlist_Exit_OnlyWindow=1 "当taglist是最后一个分割窗口时，自动推出vim
+            let Tlist_Process_File_Always=0 "是否一直处理tags.1:处理;0:不处理。不是一直实时更新tags，因为没有必要
+            let Tlist_Inc_Winwidth=0
+            let Tlist_Ctags_Cmd = '/usr/bin/ctags'
+            let Tlist_Auto_Update=1                     " Automatically update the taglist to include newly edited files.
+            "let Tlist_Enable_Fold_Column=0             " 使taglist插件不显示左边的折叠行
+            "let Tlist_File_Fold_Auto_Close=1           " 自动折叠
+            let Tlist_Show_Menu=1                       " 显示taglist菜单
+            "let Tlist_Auto_Open=1                      " 启动vim自动打开taglist
+            "let Tlist_WinWidth=30                      " 设置窗口宽度
+        endif
     " }
 
     " NerdTree {
         if isdirectory(expand("~/.vim/bundle/nerdtree"))
         " 有目录村结构的文件浏览插件
-        "map <C-n> :NERDTreeToggle<CR>
-        map <C-e> :NERDTreeToggle<CR>
+        map <F8> :NERDTreeToggle<CR>
         nmap <leader>nt :NERDTreeFind<CR>
         " 将 NERDTree 的窗口设置在 vim 窗口的右侧（默认为左侧）
         let NERDTreeWinPos="right"
@@ -483,49 +543,6 @@ set shell=/bin/bash
             nmap <leader>tb :TlistClose<CR>:TagbarToggle<CR>
             let g:tagbar_width=30                       " 设置窗口宽度
             let g:tagbar_left=1                         " 在左侧窗口中显示
-        endif
-    " }
-
-    " Ctags {
-        "-- QuickFix setting --
-        "--ctags setting--
-        set tags=tags
-        set tags+=./tags "add current directory's generated tags file
-        set tags+=/usr/include/c++/tags
-        set autochdir
-        " 按下F7重新生成tag文件，并更新taglist
-        map <F7> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
-        imap <F7> <ESC>:!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
-
-        " Make tags placed in .git/tags file available in all levels of a repository
-        let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
-        if gitroot != ''
-            let &tags = &tags . ',' . gitroot . '/.git/tags'
-        endif
-    " }
-
-    " TagList {
-        if isdirectory(expand("~/.vim/bundle/taglist.vim/"))
-            "进行Tlist的设置
-            "set open/close keyboard shortcut of taglist to F8
-            noremap<F8> :TlistToggle<CR>
-            "TlistUpdate可以更新tags
-            map <F9> :silent! Tlist<CR> "按下<F9>就可以呼出了
-
-            nmap <leader>tl :TagbarClose<CR>:Tlist<CR>
-            let Tlist_Use_Right_Window=1 "让窗口显示在右边，缺省在左侧
-            let Tlist_Show_One_File=0 "让taglist可以同时展示多个文件的函数列表，如果只显示当前文件的tags，设置为1
-            let Tlist_File_Fold_Auto_Close=1 "非当前文件，函数列表折叠隐藏
-            let Tlist_Exit_OnlyWindow=1 "当taglist是最后一个分割窗口时，自动推出vim
-            let Tlist_Process_File_Always=0 "是否一直处理tags.1:处理;0:不处理。不是一直实时更新tags，因为没有必要
-            let Tlist_Inc_Winwidth=0
-            let Tlist_Ctags_Cmd = '/usr/bin/ctags'
-            let Tlist_Auto_Update=1                     " Automatically update the taglist to include newly edited files.
-            "let Tlist_Enable_Fold_Column=0             " 使taglist插件不显示左边的折叠行
-            "let Tlist_File_Fold_Auto_Close=1           " 自动折叠
-            let Tlist_Show_Menu=1                       " 显示taglist菜单
-            "let Tlist_Auto_Open=1                      " 启动vim自动打开taglist
-            "let Tlist_WinWidth=30                      " 设置窗口宽度
         endif
     " }
 
@@ -662,7 +679,7 @@ set shell=/bin/bash
             " especially when splits are used.
             set completeopt-=preview
     " }
-    
+
     " neocomplcache {
         elseif count(g:dup_vundle_groups, 'neocomplcache')
             let g:acp_enableAtStartup = 0
@@ -888,26 +905,25 @@ set shell=/bin/bash
 
             """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
             """按下F3自动补全代码，注意该映射语句后不能有其他字符，包括tab；否则按下F3会自动补全一些乱码
-            "imap <F3> <C-X><C-O>
+            imap <F3> <C-X><C-O>
             "" 按下F2根据头文件内关键字补全
-            " imap <F2> <C-X><C-I>
-            "set completeopt=menuone,menu,longest,preview
-             set completeopt=menu,menuone " 关掉智能补全时的预览窗口
-             let OmniCpp_MayCompleteDot = 1 " autocomplete with .
-             let OmniCpp_MayCompleteArrow = 1 " autocomplete with ->
-             let OmniCpp_MayCompleteScope = 1 " autocomplete with ::
-             let OmniCpp_SelectFirstItem = 2 " select first item (but don't insert)
-             let OmniCpp_NamespaceSearch = 2 " search namespaces in this and includedfiles
-             let OmniCpp_ShowPrototypeInAbbr = 1 " show function prototype in popupwindow
-             let OmniCpp_GlobalScopeSearch=1 " enable the global scope search
-             let OmniCpp_DisplayMode=1 " Class scope completion mode: always show allmembers
-             let OmniCpp_DefaultNamespaces=["std"]
-             let OmniCpp_ShowScopeInAbbr=1 " show scope in abbreviation and remove the last column
-             let OmniCpp_ShowAccess=1
+            imap <F2> <C-X><C-I>
+            let OmniCpp_MayCompleteDot = 1 " autocomplete with .
+            let OmniCpp_MayCompleteArrow = 1 " autocomplete with ->
+            let OmniCpp_MayCompleteScope = 1 " autocomplete with ::
+            let OmniCpp_SelectFirstItem = 2 " select first item (but don't insert)
+            let OmniCpp_NamespaceSearch = 2 " search namespaces in this and includedfiles
+            let OmniCpp_ShowPrototypeInAbbr = 1 " show function prototype in popupwindow
+            let OmniCpp_GlobalScopeSearch=1 " enable the global scope search
+            let OmniCpp_DisplayMode=1 " Class scope completion mode: always show allmembers
+            let OmniCpp_DefaultNamespaces=["std"]
+            let OmniCpp_ShowScopeInAbbr=1 " show scope in abbreviation and remove the last column
+            let OmniCpp_ShowAccess=1
 
-            " 自动关闭补全窗口 
-            au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif 
-            set completeopt=menuone,menu,longest
+            " 自动关闭补全窗口
+            au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
+            set completeopt=menu,menuone " 关掉智能补全时的预览窗口
+            "set completeopt=menuone,menu,longest
         endif
     " }
 
@@ -1019,17 +1035,22 @@ set shell=/bin/bash
 
     set background=dark             " Assume a dark background
 
-    " Allow to trigger background
-    function! ToggleBG()
-        let s:tbg = &background
-        " Inversion
-        if s:tbg == "dark"
-            set background=light
-        else
-            set background=dark
-        endif
-    endfunction
-    noremap <leader>bg :call ToggleBG()<CR>
+    set cursorline  "highlight the curren line
+    set cursorcolumn
+    set laststatus=2  "always display the state line
+    set mouse=a   "use a mouse anywhere in buffer(like office in the workspace to double click the mouse
+    set nowrap                      " Do not wrap long lines
+    set autoindent                  " Indent at the same level of the previous line
+    set shiftwidth=4                " Use indents of 4 spaces
+    set expandtab                   " Tabs are spaces, not tabs
+    set tabstop=4                   " An indentation every four columns
+    set softtabstop=4               " Let backspace delete indent
+    set nojoinspaces                " Prevents inserting two spaces after punctuation on a join (J)
+    set splitright                  " Puts new vsplit windows to the right of the current
+    "set splitbelow                  " Puts new split windows to the bottom of the current
+    "set matchpairs+=<:>             " Match, to be used with %
+    set pastetoggle=<F7>           " pastetoggle (sane indentation on pastes)
+    "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
 
     " 注：使用utf-8格式后，软件与程序源码、文件路径不能有中文，否则报错
     set encoding=utf-8                                    "设置gvim内部编码，默认不更改
@@ -1050,11 +1071,9 @@ set shell=/bin/bash
 
     filetype plugin indent on       " Automatically detect file types.
     syntax on                       " Syntax highlighting
-    "set mouse=a                    " Automatically enable mouse usage
-    set mousehide                   " Hide the mouse cursor while typing
+    "set mousehide                   " Hide the mouse cursor while typing
     scriptencoding utf-8
 
-    "set expandtab                  " 将Tab键转换为空格
     set smarttab                    " 指定按一次backspace就删除shiftwidth宽度
     set textwidth=78
 
@@ -1076,39 +1095,18 @@ set shell=/bin/bash
     "set noswapfile                     " 设置无临时文件
     "set vb t_vb=                       " 关闭提示音
 
-    " Code fold {
-        "set foldenable                 " 启用折叠
-        set foldmethod=indent           " indent 折叠方式
-        "set foldmethod=marker          " marker 折叠方式
-        "set foldmethod=syntax
-        set foldlevel=100               " Don't autofold anything (but I can still fold manually)
-        "set foldopen-=search           " don't open folds when you search into them
-        "set foldopen-=undo             " don't open folds when you undo stuff
-        "set foldcolumn=4
-    " }
+    " Allow to trigger background
+    function! ToggleBG()
+        let s:tbg = &background
+        " Inversion
+        if s:tbg == "dark"
+            set background=light
+        else
+            set background=dark
+        endif
+    endfunction
+    noremap <leader>bg :call ToggleBG()<CR>
 
-" }
-
-" Formatting {
-    set cursorline  "highlight the curren line
-    set cursorcolumn
-    set number  "display line number
-    set hlsearch  "highlight character by character when searching
-    set incsearch
-    set laststatus=2  "always display the state line
-    set mouse=a   "use a mouse anywhere in buffer(like office in the workspace to double click the mouse
-    set nowrap                      " Do not wrap long lines
-    set autoindent                  " Indent at the same level of the previous line
-    set shiftwidth=4                " Use indents of 4 spaces
-    set expandtab                   " Tabs are spaces, not tabs
-    set tabstop=4                   " An indentation every four columns
-    set softtabstop=4               " Let backspace delete indent
-    set nojoinspaces                " Prevents inserting two spaces after punctuation on a join (J)
-    set splitright                  " Puts new vsplit windows to the right of the current
-    "set splitbelow                  " Puts new split windows to the bottom of the current
-    "set matchpairs+=<:>             " Match, to be used with %
-    set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
-    "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
     " Remove trailing whitespaces and ^M chars
     " To disable the stripping of whitespace, add the following:
     let g:dup_keep_trailing_whitespace = 1
@@ -1124,6 +1122,23 @@ set shell=/bin/bash
     autocmd FileType haskell setlocal commentstring=--\ %s
     " Workaround broken colour highlighting in Haskell
     autocmd FileType haskell,rust setlocal nospell
+    "%表示当前文件名，%:p表示包含文件名的全部路径，%:p:h表示文件所在路径(head of the full path)
+    autocmd BufEnter * lcd %:p:h
+    "set autochdir
+    " automatically delete trailing Dos-returns,whitespace
+    autocmd BufRead * silent! %s/[\\r \\t]\\+$//
+    autocmd BufEnter *.php :%s/[ \\t\\r]\\+$//e
+
+    " Code fold {
+        set foldenable                 " 启用折叠
+        set foldmethod=indent           " indent 折叠方式
+        "set foldmethod=marker          " marker 折叠方式
+        "set foldmethod=syntax
+        set foldlevel=100               " Don't autofold anything (but I can still fold manually)
+        "set foldopen-=search           " don't open folds when you search into them
+        "set foldopen-=undo             " don't open folds when you undo stuff
+        "set foldcolumn=4
+    " }
 
 " }
 
@@ -1136,18 +1151,18 @@ set shell=/bin/bash
     "colorscheme evening
     "color asmanian2  "set the theme background
     "colorscheme murphy "set color scheme
-    highlight LineNr cterm=bold ctermfg=red  
-    highlight StorageClass cterm=bold ctermfg=darkgreen  
-    highlight Type cterm=bold ctermfg=blue  
-    highlight LineNr cterm=bold ctermbg=black  
-    highlight phpStructure cterm=bold ctermfg=darkred  
-    highlight phpFunctions cterm=bold ctermfg=256  
-    highlight Title ctermfg=blue   
-    highlight pythonString cterm=bold ctermfg=gray  
-    highlight pythonFunction cterm=bold   
-    highlight pythonInclude cterm=bold ctermfg=lightblue  
-    highlight javaScriptStringS ctermfg=gray   
-    highlight String ctermfg=gray  
+    highlight LineNr cterm=bold ctermfg=red
+    highlight StorageClass cterm=bold ctermfg=darkgreen
+    highlight Type cterm=bold ctermfg=blue
+    highlight LineNr cterm=bold ctermbg=black
+    highlight phpStructure cterm=bold ctermfg=darkred
+    highlight phpFunctions cterm=bold ctermfg=256
+    highlight Title ctermfg=blue
+    highlight pythonString cterm=bold ctermfg=gray
+    highlight pythonFunction cterm=bold
+    highlight pythonInclude cterm=bold ctermfg=lightblue
+    highlight javaScriptStringS ctermfg=gray
+    highlight String ctermfg=gray
     hi Search cterm=NONE ctermfg=darkred ctermbg=yellow cterm=reverse
     " 显示/隐藏菜单栏、工具栏、滚动条，可用 Ctrl + F11 切换
     if g:isGUI
@@ -1155,7 +1170,7 @@ set shell=/bin/bash
         set guioptions-=T
         set guioptions-=r
         set guioptions-=L
-        nmap <silent> <c-F11> :if &guioptions =~# 'm' <Bar>
+        nmap <silent> <C-F11> :if &guioptions =~# 'm' <Bar>
             \set guioptions-=m <Bar>
             \set guioptions-=T <Bar>
             \set guioptions-=r <Bar>
@@ -1202,7 +1217,6 @@ set shell=/bin/bash
     set whichwrap=b,s,h,l,<,>,[,]   " Backspace and cursor keys wrap too
     set scrolljump=5                " Lines to scroll when cursor leaves screen
     set scrolloff=3                 " Minimum lines to keep above and below cursor
-    set foldenable                  " Auto fold code
     set list
     set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic whitespace
 
@@ -1227,7 +1241,7 @@ set shell=/bin/bash
 "        if &term == 'xterm' || &term == 'screen'
 "            set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
 "        endif
-"        "set term=builtin_ansi       " Make arrow and other keys work
+"        set term=builtin_ansi       " Make arrow and other keys work
 "    endif
 "
 "" }
@@ -1262,7 +1276,7 @@ set shell=/bin/bash
 
 " }
 
-" Functions {
+"Functions {
 
     " Strip whitespace {
     function! StripTrailingWhitespace()
