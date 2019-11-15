@@ -173,6 +173,7 @@ set shell=/bin/bash
             endif
         " }
 
+        " install one of the five Autocomplete plugins(snipmate,youcompleteme,neocomplcache,neocomplete,OmniCppComplete)
         " Snippets & AutoComplete {
             if count(g:dup_vundle_groups, 'snipmate')
                 Plugin 'garbas/vim-snipmate'
@@ -309,148 +310,6 @@ set shell=/bin/bash
     filetype plugin indent on    " required
 " }
 
-" General {
-
-    set background=dark             " Assume a dark background
-
-    " Allow to trigger background
-    function! ToggleBG()
-        let s:tbg = &background
-        " Inversion
-        if s:tbg == "dark"
-            set background=light
-        else
-            set background=dark
-        endif
-    endfunction
-    noremap <leader>bg :call ToggleBG()<CR>
-
-    " 注：使用utf-8格式后，软件与程序源码、文件路径不能有中文，否则报错
-    set encoding=utf-8                                    "设置gvim内部编码，默认不更改
-    set fileencoding=utf-8                                "设置当前文件编码，可以更改，如：gbk（同cp936）
-    set fileencodings=ucs-bom,utf-8,gbk,cp936,latin-1     "设置支持打开的文件的编码
-
-    " 文件格式，默认 ffs=dos,unix
-    set fileformat=unix                                   "设置新（当前）文件的<EOL>格式，可以更改，如：dos（windows系统常用）
-    set fileformats=unix,dos,mac                          "给出文件的<EOL>格式类型
-
-    if (g:iswindows && g:isGUI)
-        "解决菜单乱码
-        source $VIMRUNTIME/delmenu.vim
-        source $VIMRUNTIME/menu.vim
-        "解决consle输出乱码
-        language messages zh_CN.utf-8
-    endif
-
-    filetype plugin indent on       " Automatically detect file types.
-    syntax on                       " Syntax highlighting
-    "set mouse=a                    " Automatically enable mouse usage
-    set mousehide                   " Hide the mouse cursor while typing
-    scriptencoding utf-8
-
-    "set expandtab                  " 将Tab键转换为空格
-    set smarttab                    " 指定按一次backspace就删除shiftwidth宽度
-    set textwidth=78
-
-    set autoread                    " Set to auto read when a file is changed from the outside
-    "set autowrite                  " Automatically write a file when leaving a modified buffer
-
-    set shortmess+=filmnrxoOtT          " Abbrev. of messages (avoids 'hit enter')
-    set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
-    set virtualedit=onemore             " Allow for cursor beyond last character
-    set history=1000                    " Store a ton of history (default is 20)
-    "set spell                           " Spell checking on
-    set hidden                          " Allow buffer switching without saving
-    set iskeyword-=.                    " '.' is an end of word designator
-    set iskeyword-=#                    " '#' is an end of word designator
-    set iskeyword-=-                    " '-' is an end of word designator
-
-    "set writebackup                    " 保存文件前建立备份，保存成功后删除该备份
-    "set nobackup                       " 设置无备份文件
-    "set noswapfile                     " 设置无临时文件
-    "set vb t_vb=                       " 关闭提示音
-
-    " Code fold {
-        "set foldenable                 " 启用折叠
-        set foldmethod=indent           " indent 折叠方式
-        "set foldmethod=marker          " marker 折叠方式
-        "set foldmethod=syntax
-        set foldlevel=100               " Don't autofold anything (but I can still fold manually)
-        "set foldopen-=search           " don't open folds when you search into them
-        "set foldopen-=undo             " don't open folds when you undo stuff
-        "set foldcolumn=4
-    " }
-
-" }
-
-" Formatting {
-    set cursorline  "highlight the curren line
-    set cursorcolumn
-    set number  "display line number
-    set hlsearch  "highlight character by character when searching
-    set incsearch
-    set laststatus=2  "always display the state line
-    set mouse=a   "use a mouse anywhere in buffer(like office in the workspace to double click the mouse
-    set nowrap                      " Do not wrap long lines
-    set autoindent                  " Indent at the same level of the previous line
-    set shiftwidth=4                " Use indents of 4 spaces
-    set expandtab                   " Tabs are spaces, not tabs
-    set tabstop=4                   " An indentation every four columns
-    set softtabstop=4               " Let backspace delete indent
-    set nojoinspaces                " Prevents inserting two spaces after punctuation on a join (J)
-    set splitright                  " Puts new vsplit windows to the right of the current
-    "set splitbelow                  " Puts new split windows to the bottom of the current
-    "set matchpairs+=<:>             " Match, to be used with %
-    set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
-    "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
-    " Remove trailing whitespaces and ^M chars
-    " To disable the stripping of whitespace, add the following:
-    let g:dup_keep_trailing_whitespace = 1
-    autocmd FileType c,cpp,java,go,php,javascript,puppet,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> if !exists('g:dup_keep_trailing_whitespace') | call StripTrailingWhitespace() | endif
-    "autocmd FileType go autocmd BufWritePre <buffer> Fmt
-    autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
-    autocmd FileType haskell,puppet,ruby,yml setlocal expandtab shiftwidth=2 softtabstop=2
-    " preceding line best in a plugin but here for now.
-
-    autocmd BufNewFile,BufRead *.coffee set filetype=coffee
-
-    " Workaround vim-commentary for Haskell
-    autocmd FileType haskell setlocal commentstring=--\ %s
-    " Workaround broken colour highlighting in Haskell
-    autocmd FileType haskell,rust setlocal nospell
-
-" }
-
-" Key (re)Mappings {
-
-    " The default leader is '\', but many people prefer ',' as it's in a standard
-    " location. To override this behavior and set it back to '\' (or any other
-    " character)
-    " let mapleader=','
-
-    " Ctrl + K 插入模式下光标向上移动
-    imap <C-k> <Up>
-    " Ctrl + J 插入模式下光标向下移动
-    imap <C-j> <Down>
-    " Ctrl + H 插入模式下光标向左移动
-    imap <C-h> <Left>
-    " Ctrl + L 插入模式下光标向右移动
-    imap <C-l> <Right>
-
-    " 常规模式下输入 \cS 清除行尾空格
-    nmap <leader>cS :%s/\s\+$//g<CR>:noh<CR>
-    " 常规模式下输入 \cM 清除行尾 ^M(Windows换行符\r\n，*nix系统换行符是\n) 符号
-    nmap <leader>cM :%s/\r//g<CR>:noh<CR>
-
-    " Change Working Directory to that of the current file
-    "cmap cwd lcd %:p:h
-    "cmap cd. lcd %:p:h
-
-    " For when you forget to sudo.. Really Write the file.
-    "cmap w!! w !sudo tee % >/dev/null
-
-" }
-
 " Plugins Settings {
 
     " TextObj Sentence {
@@ -475,39 +334,54 @@ set shell=/bin/bash
         endif
     " }
 
-    " Ctags {
-        "-- QuickFix setting --
-        "--ctags setting--
-
-        " 按下F5重新生成tag文件，并更新taglist
-        map :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q . :TlistUpdate
-        imap :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q . :TlistUpdate
-        set tags=tags
-        set tags+=./tags "add current directory's generated tags file
-        set tags+=/usr/include/c++/tags
-        set autochdir
-        "update the keyboard shortcut setting of the ctags tag file
-        noremap<F7> :!ctags -R<CR> 
-        "set open/close keyboard shortcut of taglist to F8
-        noremap<F8> :TlistToggle<CR>
-        " Make tags placed in .git/tags file available in all levels of a repository
-        let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
-        if gitroot != ''
-            let &tags = &tags . ',' . gitroot . '/.git/tags'
-        endif
-    " }
-
     " cscope {
         autocmd BufEnter * lcd %:p:h
-        nmap <C-/>s :cs find s <C-R>=expand("<cword>")<CR><CR>:copen<CR>
-        nmap <C-/>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-        nmap <C-/>c :cs find c <C-R>=expand("<cword>")<CR><CR>:copen<CR>
-        nmap <C-/>t :cs find t <C-R>=expand("<cword>")<CR><CR>:copen<CR>
-        nmap <C-/>e :cs find e <C-R>=expand("<cword>")<CR><CR>:copen<CR>
-        nmap <C-/>f :cs find f <C-R>=expand("<cfile>")<CR><CR>:copen<CR>
-        nmap <C-/>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>:copen<CR>
-        nmap <C-/>d :cs find d <C-R>=expand("<cword>")<CR><CR>:copen<CR>
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        "addupdate the shortcut key for automatically updating.
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        noremap <F6> :!find . -iname '*.c' -o iname '*.cpp' -o iname '*.h' -o iname '*.h' -o iname '*.hpp' > cscope.files<CR>
+        	\ :!cscope -b -i cscope.files -f cscope.out<CR>
+        	\ :cs reset<CR>
 
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        " 0 or s: Find this C symbol
+        " 1 or g: Find this definition
+        " 3 or c: Find functions calling this function
+        " 4 or t: Find this text string
+        " 5 or e: Find this egrep pattern
+        " 6 or f: Find this file
+        " 7 or i: Find files #including this file
+        " 2 or d: Find functions called by this function
+        "These mappings for Ctrl-] (right bracket) and Ctrl-\ (backslash) allow you to
+        "place your cursor over the function name or C symbol and quickly query cscope
+        "for any matches.
+        "Or you may use the following scheme, inspired by Vim/Cscope tutorial from
+        "Cscope Home Page (http://cscope.sourceforge.net/): >
+        " Using 'CTRL-spacebar' then a search type makes the vim window
+        " split horizontally, with search result displayed in
+        " the new window.
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        nmap <C-Space>s :scs find s <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>g :scs find g <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>c :scs find c <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>t :scs find t <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>e :scs find e <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-Space>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
+        nmap <C-Space>i :scs find i <C-R>=expand("<cfile>")<CR>$<CR>
+        nmap <C-Space>d :scs find d <C-R>=expand("<cword>")<CR><CR>
+
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        " Hitting CTRL-space *twice* before the search type does a vertical
+        " split instead of a horizontal one
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+        nmap <C-]>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
+        nmap <C-]>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
+        nmap <C-]>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+        nmap <C-]>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
         map <F12> :call Do_CsTag()<CR>
         function Do_CsTag()
             let dir = getcwd()
@@ -612,11 +486,32 @@ set shell=/bin/bash
         endif
     " }
 
+    " Ctags {
+        "-- QuickFix setting --
+        "--ctags setting--
+        set tags=tags
+        set tags+=./tags "add current directory's generated tags file
+        set tags+=/usr/include/c++/tags
+        set autochdir
+        " 按下F7重新生成tag文件，并更新taglist
+        map <F7> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
+        imap <F7> <ESC>:!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
+
+        " Make tags placed in .git/tags file available in all levels of a repository
+        let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
+        if gitroot != ''
+            let &tags = &tags . ',' . gitroot . '/.git/tags'
+        endif
+    " }
+
     " TagList {
         if isdirectory(expand("~/.vim/bundle/taglist.vim/"))
             "进行Tlist的设置
+            "set open/close keyboard shortcut of taglist to F8
+            noremap<F8> :TlistToggle<CR>
             "TlistUpdate可以更新tags
-            map <F3> :silent! Tlist<CR> "按下F3就可以呼出了
+            map <F9> :silent! Tlist<CR> "按下<F9>就可以呼出了
+
             nmap <leader>tl :TagbarClose<CR>:Tlist<CR>
             let Tlist_Use_Right_Window=1 "让窗口显示在右边，缺省在左侧
             let Tlist_Show_One_File=0 "让taglist可以同时展示多个文件的函数列表，如果只显示当前文件的tags，设置为1
@@ -700,39 +595,35 @@ set shell=/bin/bash
         endif
     " }
 
-    " OmniComplete {
-        " To disable omni complete, add the following:
-        " let g:dup_no_omni_complete = 1
-        if !exists('g:dup_no_omni_complete')
-            if has("autocmd") && exists("+omnifunc")
-                autocmd Filetype *
-                    \if &omnifunc == "" |
-                    \setlocal omnifunc=syntaxcomplete#Complete |
-                    \endif
+    " configure one of the five Autocomplete plugins(snipmate,youcompleteme,neocomplcache,neocomplete,OmniCppComplete)
+    " Snippets {
+        if count(g:dup_vundle_groups, 'neocomplcache') ||
+                    \ count(g:dup_vundle_groups, 'neocomplete')
+
+            " Use honza's snippets.
+            let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
+
+            " Enable neosnippet snipmate compatibility mode
+            let g:neosnippet#enable_snipmate_compatibility = 1
+
+            " For snippet_complete marker.
+            if !exists("g:dup_no_conceal")
+                if has('conceal')
+                    set conceallevel=2 concealcursor=i
+                endif
             endif
 
-            hi Pmenu  guifg=#000000 guibg=#F8F8F8 ctermfg=black ctermbg=Lightgray
-            hi PmenuSbar  guifg=#8A95A7 guibg=#F8F8F8 gui=NONE ctermfg=darkcyan ctermbg=lightgray cterm=NONE
-            hi PmenuThumb  guifg=#F8F8F8 guibg=#8A95A7 gui=NONE ctermfg=lightgray ctermbg=darkcyan cterm=NONE
+            " Enable neosnippets when using go
+            let g:go_snippet_engine = "neosnippet"
 
-            " Some convenient mappings
-            "inoremap <expr> <Esc>      pumvisible() ? "\<C-e>" : "\<Esc>"
-            if exists('g:dup_map_cr_omni_complete')
-                inoremap <expr> <CR>     pumvisible() ? "\<C-y>" : "\<CR>"
-            endif
-            inoremap <expr> <Down>     pumvisible() ? "\<C-n>" : "\<Down>"
-            inoremap <expr> <Up>       pumvisible() ? "\<C-p>" : "\<Up>"
-            inoremap <expr> <C-d>      pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<C-d>"
-            inoremap <expr> <C-u>      pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<C-u>"
-
-            " Automatically open and close the popup menu / preview window
-            au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
-            set completeopt=menu,preview,longest
-        endif
+            " Disable the neosnippet preview candidate window
+            " When enabled, there can be too much visual noise
+            " especially when splits are used.
+            set completeopt-=preview
     " }
 
     " YouCompleteMe {
-        if count(g:dup_vundle_groups, 'youcompleteme')
+        elseif count(g:dup_vundle_groups, 'youcompleteme')
             let g:acp_enableAtStartup = 0
 
             " enable completion from tags
@@ -770,11 +661,111 @@ set shell=/bin/bash
             " When enabled, there can be too much visual noise
             " especially when splits are used.
             set completeopt-=preview
-        endif
     " }
+    
+    " neocomplcache {
+        elseif count(g:dup_vundle_groups, 'neocomplcache')
+            let g:acp_enableAtStartup = 0
+            let g:neocomplcache_enable_at_startup = 1
+            let g:neocomplcache_enable_camel_case_completion = 1
+            let g:neocomplcache_enable_smart_case = 1
+            let g:neocomplcache_enable_underbar_completion = 1
+            let g:neocomplcache_enable_auto_delimiter = 1
+            let g:neocomplcache_max_list = 15
+            let g:neocomplcache_force_overwrite_completefunc = 1
 
+            " Define dictionary.
+            let g:neocomplcache_dictionary_filetype_lists = {
+                        \ 'default' : '',
+                        \ 'vimshell' : $HOME.'/.vimshell_hist',
+                        \ 'scheme' : $HOME.'/.gosh_completions'
+                        \ }
+
+            " Define keyword.
+            if !exists('g:neocomplcache_keyword_patterns')
+                let g:neocomplcache_keyword_patterns = {}
+            endif
+            let g:neocomplcache_keyword_patterns._ = '\h\w*'
+
+            " Plugin key-mappings {
+                " These two lines conflict with the default digraph mapping of <C-K>
+                imap <C-k> <Plug>(neosnippet_expand_or_jump)
+                smap <C-k> <Plug>(neosnippet_expand_or_jump)
+                if exists('g:dup_noninvasive_completion')
+                    inoremap <CR> <CR>
+                    " <ESC> takes you out of insert mode
+                    inoremap <expr> <Esc>   pumvisible() ? "\<C-y>\<Esc>" : "\<Esc>"
+                    " <CR> accepts first, then sends the <CR>
+                    inoremap <expr> <CR>    pumvisible() ? "\<C-y>\<CR>" : "\<CR>"
+                    " <Down> and <Up> cycle like <Tab> and <S-Tab>
+                    inoremap <expr> <Down>  pumvisible() ? "\<C-n>" : "\<Down>"
+                    inoremap <expr> <Up>    pumvisible() ? "\<C-p>" : "\<Up>"
+                    " Jump up and down the list
+                    inoremap <expr> <C-d>   pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<C-d>"
+                    inoremap <expr> <C-u>   pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<C-u>"
+                else
+                    imap <silent><expr><C-k> neosnippet#expandable() ?
+                                \ "\<Plug>(neosnippet_expand_or_jump)" : (pumvisible() ?
+                                \ "\<C-e>" : "\<Plug>(neosnippet_expand_or_jump)")
+                    smap <TAB> <Right><Plug>(neosnippet_jump_or_expand)
+
+                    inoremap <expr><C-g> neocomplcache#undo_completion()
+                    inoremap <expr><C-l> neocomplcache#complete_common_string()
+                    "inoremap <expr><CR> neocomplcache#complete_common_string()
+
+                    function! CleverCr()
+                        if pumvisible()
+                            if neosnippet#expandable()
+                                let exp = "\<Plug>(neosnippet_expand)"
+                                return exp . neocomplcache#close_popup()
+                            else
+                                return neocomplcache#close_popup()
+                            endif
+                        else
+                            return "\<CR>"
+                        endif
+                    endfunction
+
+                    " <CR> close popup and save indent or expand snippet
+                    imap <expr> <CR> CleverCr()
+
+                    " <CR>: close popup
+                    " <s-CR>: close popup and save indent.
+                    inoremap <expr><s-CR> pumvisible() ? neocomplcache#close_popup()."\<CR>" : "\<CR>"
+                    "inoremap <expr><CR> pumvisible() ? neocomplcache#close_popup() : "\<CR>"
+
+                    " <C-h>, <BS>: close popup and delete backword char.
+                    inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+                    inoremap <expr><C-y> neocomplcache#close_popup()
+                endif
+                " <TAB>: completion.
+                inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+                inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
+            " }
+
+            " Enable omni completion.
+            autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+            autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+            autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+            autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+            autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+            autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+            autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
+
+            " Enable heavy omni completion.
+            if !exists('g:neocomplcache_omni_patterns')
+                let g:neocomplcache_omni_patterns = {}
+            endif
+            let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+            let g:neocomplcache_omni_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+            let g:neocomplcache_omni_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+            let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+            let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
+            let g:neocomplcache_omni_patterns.go = '\h\w*\.\?'
+    " }
+    
     " neocomplete {
-        if count(g:dup_vundle_groups, 'neocomplete')
+        elseif count(g:dup_vundle_groups, 'neocomplete')
             let g:acp_enableAtStartup = 0
             let g:neocomplete#enable_at_startup = 1
             let g:neocomplete#enable_smart_case = 1
@@ -888,159 +879,35 @@ set shell=/bin/bash
             let g:neocomplete#sources#omni#input_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
     " }
 
-    " neocomplcache {
-        elseif count(g:dup_vundle_groups, 'neocomplcache')
-            let g:acp_enableAtStartup = 0
-            let g:neocomplcache_enable_at_startup = 1
-            let g:neocomplcache_enable_camel_case_completion = 1
-            let g:neocomplcache_enable_smart_case = 1
-            let g:neocomplcache_enable_underbar_completion = 1
-            let g:neocomplcache_enable_auto_delimiter = 1
-            let g:neocomplcache_max_list = 15
-            let g:neocomplcache_force_overwrite_completefunc = 1
-
-            " Define dictionary.
-            let g:neocomplcache_dictionary_filetype_lists = {
-                        \ 'default' : '',
-                        \ 'vimshell' : $HOME.'/.vimshell_hist',
-                        \ 'scheme' : $HOME.'/.gosh_completions'
-                        \ }
-
-            " Define keyword.
-            if !exists('g:neocomplcache_keyword_patterns')
-                let g:neocomplcache_keyword_patterns = {}
-            endif
-            let g:neocomplcache_keyword_patterns._ = '\h\w*'
-
-            " Plugin key-mappings {
-                " These two lines conflict with the default digraph mapping of <C-K>
-                imap <C-k> <Plug>(neosnippet_expand_or_jump)
-                smap <C-k> <Plug>(neosnippet_expand_or_jump)
-                if exists('g:dup_noninvasive_completion')
-                    inoremap <CR> <CR>
-                    " <ESC> takes you out of insert mode
-                    inoremap <expr> <Esc>   pumvisible() ? "\<C-y>\<Esc>" : "\<Esc>"
-                    " <CR> accepts first, then sends the <CR>
-                    inoremap <expr> <CR>    pumvisible() ? "\<C-y>\<CR>" : "\<CR>"
-                    " <Down> and <Up> cycle like <Tab> and <S-Tab>
-                    inoremap <expr> <Down>  pumvisible() ? "\<C-n>" : "\<Down>"
-                    inoremap <expr> <Up>    pumvisible() ? "\<C-p>" : "\<Up>"
-                    " Jump up and down the list
-                    inoremap <expr> <C-d>   pumvisible() ? "\<PageDown>\<C-p>\<C-n>" : "\<C-d>"
-                    inoremap <expr> <C-u>   pumvisible() ? "\<PageUp>\<C-p>\<C-n>" : "\<C-u>"
-                else
-                    imap <silent><expr><C-k> neosnippet#expandable() ?
-                                \ "\<Plug>(neosnippet_expand_or_jump)" : (pumvisible() ?
-                                \ "\<C-e>" : "\<Plug>(neosnippet_expand_or_jump)")
-                    smap <TAB> <Right><Plug>(neosnippet_jump_or_expand)
-
-                    inoremap <expr><C-g> neocomplcache#undo_completion()
-                    inoremap <expr><C-l> neocomplcache#complete_common_string()
-                    "inoremap <expr><CR> neocomplcache#complete_common_string()
-
-                    function! CleverCr()
-                        if pumvisible()
-                            if neosnippet#expandable()
-                                let exp = "\<Plug>(neosnippet_expand)"
-                                return exp . neocomplcache#close_popup()
-                            else
-                                return neocomplcache#close_popup()
-                            endif
-                        else
-                            return "\<CR>"
-                        endif
-                    endfunction
-
-                    " <CR> close popup and save indent or expand snippet
-                    imap <expr> <CR> CleverCr()
-
-                    " <CR>: close popup
-                    " <s-CR>: close popup and save indent.
-                    inoremap <expr><s-CR> pumvisible() ? neocomplcache#close_popup()."\<CR>" : "\<CR>"
-                    "inoremap <expr><CR> pumvisible() ? neocomplcache#close_popup() : "\<CR>"
-
-                    " <C-h>, <BS>: close popup and delete backword char.
-                    inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-                    inoremap <expr><C-y> neocomplcache#close_popup()
-                endif
-                " <TAB>: completion.
-                inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-                inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
-            " }
-
-            " Enable omni completion.
-            autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-            autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-            autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-            autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-            autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-            autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-            autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
-
-            " Enable heavy omni completion.
-            if !exists('g:neocomplcache_omni_patterns')
-                let g:neocomplcache_omni_patterns = {}
-            endif
-            let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-            let g:neocomplcache_omni_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-            let g:neocomplcache_omni_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-            let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-            let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
-            let g:neocomplcache_omni_patterns.go = '\h\w*\.\?'
-    " }
-
-    " Normal Vim omni-completion {
-        " To disable omni complete, add the following:
-        " let g:dup_no_omni_complete = 1
-        elseif !exists('g:dup_no_omni_complete')
-            " Enable omni-completion.
-            autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-            autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-            autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-            autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-            autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-            autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-            autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
-
-        endif
-    " }
-
-    " Snippets {
-        if count(g:dup_vundle_groups, 'neocomplcache') ||
-                    \ count(g:dup_vundle_groups, 'neocomplete')
-
-            " Use honza's snippets.
-            let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
-
-            " Enable neosnippet snipmate compatibility mode
-            let g:neosnippet#enable_snipmate_compatibility = 1
-
-            " For snippet_complete marker.
-            if !exists("g:dup_no_conceal")
-                if has('conceal')
-                    set conceallevel=2 concealcursor=i
-                endif
-            endif
-
-            " Enable neosnippets when using go
-            let g:go_snippet_engine = "neosnippet"
-
-            " Disable the neosnippet preview candidate window
-            " When enabled, there can be too much visual noise
-            " especially when splits are used.
-            set completeopt-=preview
-        endif
-    " }
-
     " OmniCppComplete {
-        if count(g:dup_vundle_groups, 'OmniCppComplete')
-             " 用于C/C++代码补全，这种补全主要针对命名空间、类、结构、共同体等进行补全
-             " 使用前先执行如下 ctags 命令
-             set completeopt=longest,menu           "关闭预览窗口
-             let OmniCpp_NamespaceSearch = 2        "search namespaces in the current buffer and in included files
-             let OmniCpp_ShowPrototypeInAbbr = 1    "display function parameter list
-             let OmniCpp_MayCompleteScope = 1       "type in :: auto complete
-             let OmniCpp_DefaultNamespaces = ["std", "_GLIBCXX_STD"]
+        elseif count(g:dup_vundle_groups, 'OmniCppComplete')
+            """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
+            " omnicppcomplete设置
+            " 用于C/C++代码补全，这种补全主要针对命名空间、类、结构、共同体等进行补全
+            " 使用前先执行如下 ctags 命令
+
+            """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
+            """按下F3自动补全代码，注意该映射语句后不能有其他字符，包括tab；否则按下F3会自动补全一些乱码
+            "imap <F3> <C-X><C-O>
+            "" 按下F2根据头文件内关键字补全
+            " imap <F2> <C-X><C-I>
+            "set completeopt=menuone,menu,longest,preview
+             set completeopt=menu,menuone " 关掉智能补全时的预览窗口
+             let OmniCpp_MayCompleteDot = 1 " autocomplete with .
+             let OmniCpp_MayCompleteArrow = 1 " autocomplete with ->
+             let OmniCpp_MayCompleteScope = 1 " autocomplete with ::
+             let OmniCpp_SelectFirstItem = 2 " select first item (but don't insert)
+             let OmniCpp_NamespaceSearch = 2 " search namespaces in this and includedfiles
+             let OmniCpp_ShowPrototypeInAbbr = 1 " show function prototype in popupwindow
+             let OmniCpp_GlobalScopeSearch=1 " enable the global scope search
+             let OmniCpp_DisplayMode=1 " Class scope completion mode: always show allmembers
+             let OmniCpp_DefaultNamespaces=["std"]
+             let OmniCpp_ShowScopeInAbbr=1 " show scope in abbreviation and remove the last column
+             let OmniCpp_ShowAccess=1
+
+            " 自动关闭补全窗口 
+            au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif 
+            set completeopt=menuone,menu,longest
         endif
     " }
 
@@ -1148,128 +1015,116 @@ set shell=/bin/bash
 
 " }
 
-" Functions {
+"General {
 
-    " Strip whitespace {
-    function! StripTrailingWhitespace()
-        " Preparation: save last search, and cursor position.
-        let _s=@/
-        let l = line(".")
-        let c = col(".")
-        " do the business:
-        %s/\s\+$//e
-        " clean up: restore previous search history, and cursor position
-        let @/=_s
-        call cursor(l, c)
+    set background=dark             " Assume a dark background
+
+    " Allow to trigger background
+    function! ToggleBG()
+        let s:tbg = &background
+        " Inversion
+        if s:tbg == "dark"
+            set background=light
+        else
+            set background=dark
+        endif
     endfunction
+    noremap <leader>bg :call ToggleBG()<CR>
+
+    " 注：使用utf-8格式后，软件与程序源码、文件路径不能有中文，否则报错
+    set encoding=utf-8                                    "设置gvim内部编码，默认不更改
+    set fileencoding=utf-8                                "设置当前文件编码，可以更改，如：gbk（同cp936）
+    set fileencodings=ucs-bom,utf-8,gbk,cp936,latin-1     "设置支持打开的文件的编码
+
+    " 文件格式，默认 ffs=dos,unix
+    set fileformat=unix                                   "设置新（当前）文件的<EOL>格式，可以更改，如：dos（windows系统常用）
+    set fileformats=unix,dos,mac                          "给出文件的<EOL>格式类型
+
+    if (g:iswindows && g:isGUI)
+        "解决菜单乱码
+        source $VIMRUNTIME/delmenu.vim
+        source $VIMRUNTIME/menu.vim
+        "解决consle输出乱码
+        language messages zh_CN.utf-8
+    endif
+
+    filetype plugin indent on       " Automatically detect file types.
+    syntax on                       " Syntax highlighting
+    "set mouse=a                    " Automatically enable mouse usage
+    set mousehide                   " Hide the mouse cursor while typing
+    scriptencoding utf-8
+
+    "set expandtab                  " 将Tab键转换为空格
+    set smarttab                    " 指定按一次backspace就删除shiftwidth宽度
+    set textwidth=78
+
+    set autoread                    " Set to auto read when a file is changed from the outside
+    "set autowrite                  " Automatically write a file when leaving a modified buffer
+
+    set shortmess+=filmnrxoOtT          " Abbrev. of messages (avoids 'hit enter')
+    set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
+    set virtualedit=onemore             " Allow for cursor beyond last character
+    set history=1000                    " Store a ton of history (default is 20)
+    "set spell                           " Spell checking on
+    set hidden                          " Allow buffer switching without saving
+    set iskeyword-=.                    " '.' is an end of word designator
+    set iskeyword-=#                    " '#' is an end of word designator
+    set iskeyword-=-                    " '-' is an end of word designator
+
+    "set writebackup                    " 保存文件前建立备份，保存成功后删除该备份
+    "set nobackup                       " 设置无备份文件
+    "set noswapfile                     " 设置无临时文件
+    "set vb t_vb=                       " 关闭提示音
+
+    " Code fold {
+        "set foldenable                 " 启用折叠
+        set foldmethod=indent           " indent 折叠方式
+        "set foldmethod=marker          " marker 折叠方式
+        "set foldmethod=syntax
+        set foldlevel=100               " Don't autofold anything (but I can still fold manually)
+        "set foldopen-=search           " don't open folds when you search into them
+        "set foldopen-=undo             " don't open folds when you undo stuff
+        "set foldcolumn=4
     " }
 
 " }
 
-"cscope shortkey {
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    " 0 or s: Find this C symbol
-    " 1 or g: Find this definition
-    " 3 or c: Find functions calling this function
-    " 4 or t: Find this text string
-    " 5 or e: Find this egrep pattern
-    " 6 or f: Find this file
-    " 7 or i: Find files #including this file
-    " 2 or d: Find functions called by this function
-    "These mappings for Ctrl-] (right bracket) and Ctrl-\ (backslash) allow you to
-    "place your cursor over the function name or C symbol and quickly query cscope
-    "for any matches.
-    "Or you may use the following scheme, inspired by Vim/Cscope tutorial from
-    "Cscope Home Page (http://cscope.sourceforge.net/): >
-    " Using 'CTRL-spacebar' then a search type makes the vim window
-    " split horizontally, with search result displayed in
-    " the new window.
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    nmap <C-Space>s :scs find s <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-Space>g :scs find g <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-Space>c :scs find c <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-Space>t :scs find t <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-Space>e :scs find e <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-Space>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
-    nmap <C-Space>i :scs find i <C-R>=expand("<cfile>")<CR><CR>
-    nmap <C-Space>d :scs find d <C-R>=expand("<cword>")<CR><CR>
-    
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    " Hitting CTRL-space *twice* before the search type does a vertical
-    " split instead of a horizontal one
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    nmap <C-]>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-]>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-]>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-]>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-]>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-]>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
-    nmap <C-]>i :vert scs find i <C-R>=expand("<cfile>")<CR><CR>
-    nmap <C-]>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
-" }
+" Formatting {
+    set cursorline  "highlight the curren line
+    set cursorcolumn
+    set number  "display line number
+    set hlsearch  "highlight character by character when searching
+    set incsearch
+    set laststatus=2  "always display the state line
+    set mouse=a   "use a mouse anywhere in buffer(like office in the workspace to double click the mouse
+    set nowrap                      " Do not wrap long lines
+    set autoindent                  " Indent at the same level of the previous line
+    set shiftwidth=4                " Use indents of 4 spaces
+    set expandtab                   " Tabs are spaces, not tabs
+    set tabstop=4                   " An indentation every four columns
+    set softtabstop=4               " Let backspace delete indent
+    set nojoinspaces                " Prevents inserting two spaces after punctuation on a join (J)
+    set splitright                  " Puts new vsplit windows to the right of the current
+    "set splitbelow                  " Puts new split windows to the bottom of the current
+    "set matchpairs+=<:>             " Match, to be used with %
+    set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
+    "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
+    " Remove trailing whitespaces and ^M chars
+    " To disable the stripping of whitespace, add the following:
+    let g:dup_keep_trailing_whitespace = 1
+    autocmd FileType c,cpp,java,go,php,javascript,puppet,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> if !exists('g:dup_keep_trailing_whitespace') | call StripTrailingWhitespace() | endif
+    "autocmd FileType go autocmd BufWritePre <buffer> Fmt
+    autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
+    autocmd FileType haskell,puppet,ruby,yml setlocal expandtab shiftwidth=2 softtabstop=2
+    " preceding line best in a plugin but here for now.
 
-" Other {
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    "file .c,.h,.sh,.java files,automatically insert the file header
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    "autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java exec ":call SetTitle()"
-    "func SetTitle()
-    "    if &filetype == 'sh'
-    "        call setline(1, "\########################################################################")
-    "        call append(line("."), "\# File Name: ".expand("%"))
-    "        call append(line(".")+1, "\# Author: zhouqipeng")
-    "        call append(line(".")+2, "\# mail: qi-pendg.zhou@hp.com")
-    "        call append(line(".")+3, "\# Create Time: ".strftime("%c"))
-    "        call append(line(".")+4, "\########################################################################")
-    "        call append(line(".")+5, "\#! /bin/bash")
-    "        call append(line(".")+6, "")
-    "    else
-    "        call setline(1, "\************************************************************************")
-    "        call append(line("."), "\# File Name: ".expand("%"))
-    "        call append(line(".")+1, "\# Author: zhouqipeng")
-    "        call append(line(".")+2, "\# mail: qi-pendg.zhou@hp.com")
-    "        call append(line(".")+3, "\# Create Time: ".strftime("%c"))
-    "        call append(line(".")+4, "\************************************************************************")
-    "        call append(line(".")+5, "")
-    "    if &filetype == 'cpp'
-    "        call append(line(".")+6, "#include <iostream>"
-    "        call append(line(".")+7, "using namespace std"
-    "        call append(line(".")+8, "")
-    "    if &filetype == 'c'
-    "        call append(line(".")+6, "#include <stdio.h>"
-    "        call append(line(".")+7, "")
-    "    autocmd BufNewFile * normal G "automatically locate the file at the end of the file after the new file is built
-    "endfunc
-    "
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    "compile and run by F5 for c,c++
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    "map <F5> :call CompileRunGcc()<CR>
-    "func! CompileRunGcc()
-    "    exec "w"
-    "    if &filetype  == 'c'
-    "        exec "!g++ % -o %<"
-    "        exec "! ./%<"
-    "    elseif &filetype == 'cpp'
-    "        exec "!g++ % -o %<"
-    "        exec "! ./%<"
-    "    elseif &filetype == 'java'
-    "        exec "!javac %"
-    "        exec "!java %<"
-    "    elseif &filetype == 'sh'
-    "        :! ./%
-    "    endif
-    "endfunc
+    autocmd BufNewFile,BufRead *.coffee set filetype=coffee
 
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    "debug for c,c++
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    "map <Fx> :call Rungdb()<CR>
-    "func! Rungdb()
-    "    exec "w"
-    "    exec "!g++ % -g -o %<"
-    "    exec "!gdb ./%<"
-    "endfunc
+    " Workaround vim-commentary for Haskell
+    autocmd FileType haskell setlocal commentstring=--\ %s
+    " Workaround broken colour highlighting in Haskell
+    autocmd FileType haskell,rust setlocal nospell
+
 " }
 
 " VIM UI {
@@ -1376,3 +1231,115 @@ set shell=/bin/bash
 "    endif
 "
 "" }
+
+" Key (re)Mappings {
+
+    " The default leader is '\', but many people prefer ',' as it's in a standard
+    " location. To override this behavior and set it back to '\' (or any other
+    " character)
+    " let mapleader=','
+
+    " Ctrl + K 插入模式下光标向上移动
+    imap <C-k> <Up>
+    " Ctrl + J 插入模式下光标向下移动
+    imap <C-j> <Down>
+    " Ctrl + H 插入模式下光标向左移动
+    imap <C-h> <Left>
+    " Ctrl + L 插入模式下光标向右移动
+    imap <C-l> <Right>
+
+    " 常规模式下输入 \cS 清除行尾空格
+    nmap <leader>cS :%s/\s\+$//g<CR>:noh<CR>
+    " 常规模式下输入 \cM 清除行尾 ^M(Windows换行符\r\n，*nix系统换行符是\n) 符号
+    nmap <leader>cM :%s/\r//g<CR>:noh<CR>
+
+    " Change Working Directory to that of the current file
+    "cmap cwd lcd %:p:h
+    "cmap cd. lcd %:p:h
+
+    " For when you forget to sudo.. Really Write the file.
+    "cmap w!! w !sudo tee % >/dev/null
+
+" }
+
+" Functions {
+
+    " Strip whitespace {
+    function! StripTrailingWhitespace()
+        " Preparation: save last search, and cursor position.
+        let _s=@/
+        let l = line(".")
+        let c = col(".")
+        " do the business:
+        %s/\s\+$//e
+        " clean up: restore previous search history, and cursor position
+        let @/=_s
+        call cursor(l, c)
+    endfunction
+    " }
+
+" }
+
+" Other {
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    "file .c,.h,.sh,.java files,automatically insert the file header
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    "autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java exec ":call SetTitle()"
+    "func SetTitle()
+    "    if &filetype == 'sh'
+    "        call setline(1, "\########################################################################")
+    "        call append(line("."), "\# File Name: ".expand("%"))
+    "        call append(line(".")+1, "\# Author: zhouqipeng")
+    "        call append(line(".")+2, "\# mail: qi-pendg.zhou@hp.com")
+    "        call append(line(".")+3, "\# Create Time: ".strftime("%c"))
+    "        call append(line(".")+4, "\########################################################################")
+    "        call append(line(".")+5, "\#! /bin/bash")
+    "        call append(line(".")+6, "")
+    "    else
+    "        call setline(1, "\************************************************************************")
+    "        call append(line("."), "\# File Name: ".expand("%"))
+    "        call append(line(".")+1, "\# Author: zhouqipeng")
+    "        call append(line(".")+2, "\# mail: qi-pendg.zhou@hp.com")
+    "        call append(line(".")+3, "\# Create Time: ".strftime("%c"))
+    "        call append(line(".")+4, "\************************************************************************")
+    "        call append(line(".")+5, "")
+    "    if &filetype == 'cpp'
+    "        call append(line(".")+6, "#include <iostream>"
+    "        call append(line(".")+7, "using namespace std"
+    "        call append(line(".")+8, "")
+    "    if &filetype == 'c'
+    "        call append(line(".")+6, "#include <stdio.h>"
+    "        call append(line(".")+7, "")
+    "    autocmd BufNewFile * normal G "automatically locate the file at the end of the file after the new file is built
+    "endfunc
+    "
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    "compile and run by Fx for c,c++
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    "map <Fx> :call CompileRunGcc()<CR>
+    "func! CompileRunGcc()
+    "    exec "w"
+    "    if &filetype  == 'c'
+    "        exec "!g++ % -o %<"
+    "        exec "! ./%<"
+    "    elseif &filetype == 'cpp'
+    "        exec "!g++ % -o %<"
+    "        exec "! ./%<"
+    "    elseif &filetype == 'java'
+    "        exec "!javac %"
+    "        exec "!java %<"
+    "    elseif &filetype == 'sh'
+    "        :! ./%
+    "    endif
+    "endfunc
+
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    "debug for c,c++
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    "map <Fx> :call Rungdb()<CR>
+    "func! Rungdb()
+    "    exec "w"
+    "    exec "!g++ % -g -o %<"
+    "    exec "!gdb ./%<"
+    "endfunc
+" }
