@@ -1401,38 +1401,38 @@ set shell=/bin/bash
     " buffer 切换快捷键
     map <C-Tab> :MBEbn<cr>
     map <C-S-Tab> :MBEbp<cr>
-"	" 环境恢复
-"	
-"	" 设置环境保存项
-"	set sessionoptions="blank,globals,localoptions,tabpages,sesdir,folds,help,options,resize,winpos,winsize"
-"	
-"	" 保存 undo 历史。必须先行创建 .undo_history/
-"	set undodir=~/.undo_history/
-"	set undofile
-"	
-"	" 保存快捷键
-"	"map <leader>ss :mksession! my.vim<cr> :wviminfo! my.viminfo<cr>
-"	map <leader>ss :mksession! my.vim<cr>
-"	
-"	" 恢复快捷键
-"	"map <leader>rs :source my.vim<cr> :rviminfo my.viminfo<cr>
-"	map <leader>rs :source my.vim<cr>
-"	
-"	" 设置快捷键实现一键编译及运行
-"	nmap <Leader>m :wa<CR> :cd build/<CR> :!rm -rf main<CR> :!cmake CMakeLists.txt<CR>:make<CR><CR> :cw<CR> :cd ..<CR>
-"	nmap <Leader>g :wa<CR>:cd build/<CR>:!rm -rf main<CR>:!cmake CMakeLists.txt<CR>:make<CR><CR>:cw<CR>:cd ..<CR>:!build/main<CR>
-"	
-"	" 快速选中结对符内的文本
-"	 
-"	" 快捷键
-"	map <SPACE> <Plug>(wildfire-fuel)
-"	vmap <S-SPACE> <Plug>(wildfire-water)
-"	
-"	" 适用于哪些结对符
-"	let g:wildfire_objects = ["i'", 'i"', "i)", "i]", "i}", "i>", "ip"]
-"	
-"	" 调用 gundo 树
-"	nnoremap <Leader>ud :GundoToggle<CR>
+	" 环境恢复
+	
+	" 设置环境保存项
+	set sessionoptions="blank,globals,localoptions,tabpages,sesdir,folds,help,options,resize,winpos,winsize"
+	
+	" 保存 undo 历史。必须先行创建 .undo_history/
+	set undodir=~/.undo_history/
+	set undofile
+	
+	" 保存快捷键
+	"map <leader>ss :mksession! my.vim<cr> :wviminfo! my.viminfo<cr>
+	map <leader>ss :mksession! my.vim<cr>
+	
+	" 恢复快捷键
+	"map <leader>rs :source my.vim<cr> :rviminfo my.viminfo<cr>
+	map <leader>rs :source my.vim<cr>
+	
+	" 设置快捷键实现一键编译及运行
+	nmap <Leader>m :wa<CR> :cd build/<CR> :!rm -rf main<CR> :!cmake CMakeLists.txt<CR>:make<CR><CR> :cw<CR> :cd ..<CR>
+	nmap <Leader>g :wa<CR>:cd build/<CR>:!rm -rf main<CR>:!cmake CMakeLists.txt<CR>:make<CR><CR>:cw<CR>:cd ..<CR>:!build/main<CR>
+	
+	" 快速选中结对符内的文本
+	 
+	" 快捷键
+	map <SPACE> <Plug>(wildfire-fuel)
+	vmap <S-SPACE> <Plug>(wildfire-water)
+	
+	" 适用于哪些结对符
+	let g:wildfire_objects = ["i'", 'i"', "i)", "i]", "i}", "i>", "ip"]
+	
+	" 调用 gundo 树
+	nnoremap <Leader>ud :GundoToggle<CR>
 
 " }
 
