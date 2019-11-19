@@ -369,7 +369,7 @@ set shell=/bin/bash
         	set csverb
         endif
 
-        function Do_CsTag()
+        function! Do_CsTag()
             let dir = getcwd()
             if filereadable("tags")
                 if(g:iswindows==1)
@@ -1095,6 +1095,15 @@ set shell=/bin/bash
     "set noswapfile                     " 设置无临时文件
     "set vb t_vb=                       " 关闭提示音
 
+    " 将外部命令 wmctrl 控制窗口最大化的命令行参数封装成一个 vim 的函数
+    function! ToggleFullscreen()
+	    call system("wmctrl -ir " . v:windowid . " -b toggle,fullscreen")
+    endf
+    " 全屏开/关快捷键
+    map <silent> <F12> :call ToggleFullscreen()<CR>
+    "" 启动 vim 时自动全屏
+    "autocmd VimEnter * call ToggleFullscreen()
+
     " Allow to trigger background
     function! ToggleBG()
         let s:tbg = &background
@@ -1164,13 +1173,13 @@ set shell=/bin/bash
     highlight javaScriptStringS ctermfg=gray
     highlight String ctermfg=gray
     hi Search cterm=NONE ctermfg=darkred ctermbg=yellow cterm=reverse
-    " 显示/隐藏菜单栏、工具栏、滚动条，可用 Ctrl + F11 切换
+    " 显示/隐藏菜单栏、工具栏、滚动条，可用 Ctrl + F1 切换
     if g:isGUI
         set guioptions-=m
         set guioptions-=T
         set guioptions-=r
         set guioptions-=L
-        nmap <silent> <C-F11> :if &guioptions =~# 'm' <Bar>
+        nmap <silent> <C-F1> :if &guioptions =~# 'm' <Bar>
             \set guioptions-=m <Bar>
             \set guioptions-=T <Bar>
             \set guioptions-=r <Bar>
@@ -1222,30 +1231,6 @@ set shell=/bin/bash
 
 " }
 
-"" GUI Settings {
-"
-"    " GVIM- (here instead of .gvimrc)
-"    if has('gui_running')
-"        set guioptions-=T           " Remove the toolbar
-"        set lines=40                " 40 lines of text instead of 24
-"        if !exists("g:dup_no_big_font")
-"            if LINUX() && has("gui_running")
-"                set guifont=Andale\ Mono\ Regular\ 12,Menlo\ Regular\ 11,Consolas\ Regular\ 12,Courier\ New\ Regular\ 14
-"            elseif OSX() && has("gui_running")
-"                set guifont=Andale\ Mono\ Regular:h12,Menlo\ Regular:h11,Consolas\ Regular:h12,Courier\ New\ Regular:h14
-"            elseif WINDOWS() && has("gui_running")
-"                set guifont=Andale_Mono:h10,Menlo:h10,Consolas:h10,Courier_New:h10
-"            endif
-"        endif
-"    else
-"        if &term == 'xterm' || &term == 'screen'
-"            set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
-"        endif
-"        set term=builtin_ansi       " Make arrow and other keys work
-"    endif
-"
-"" }
-
 " Key (re)Mappings {
 
     " The default leader is '\', but many people prefer ',' as it's in a standard
@@ -1274,6 +1259,181 @@ set shell=/bin/bash
     " For when you forget to sudo.. Really Write the file.
     "cmap w!! w !sudo tee % >/dev/null
 
+    " 定义快捷键的前缀，即 <Leader>
+	let mapleader=";"
+	
+	" 文件类型侦测
+	
+	" 开启文件类型侦测
+	filetype on
+	" 根据侦测到的不同类型加载对应的插件
+	filetype plugin on
+	
+	" vim 自身（非插件）快捷键
+	
+	" 定义快捷键到行首和行尾
+	nmap LB 0
+	nmap LE $
+	
+	" 设置快捷键将选中文本块复制至系统剪贴板
+	vnoremap <Leader>y "+y
+	" 设置快捷键将系统剪贴板内容粘贴至vim
+	nmap <Leader>p "+p
+	
+	" 定义快捷键关闭当前分割窗口
+	nmap <Leader>q :q<CR>
+	" 定义快捷键保存当前窗口内容
+	nmap <Leader>w :w<CR>
+	" 定义快捷键保存所有窗口内容并退出 vim
+	nmap <Leader>WQ :wa<CR>:q<CR>
+	" 不做任何保存，直接退出 vim
+	nmap <Leader>Q :qa!<CR>
+	
+"	" 设置快捷键遍历子窗口
+"	" 依次遍历
+"	nnoremap nw <C-W><C-W>
+"	" 跳转至右方的窗口
+"	nnoremap <Leader>lw <C-W>l
+"	" 跳转至方的窗口
+"	nnoremap <Leader>hw <C-W>h
+"	" 跳转至上方的子窗口
+"	nnoremap <Leader>kw <C-W>k
+"	" 跳转至下方的子窗口
+"	nnoremap <Leader>jw <C-W>j
+	
+	" 定义快捷键在结对符之间跳转
+	nmap <Leader>M %
+    " 接口与实现快速切换
+
+    " *.cpp 和 *.h 间切换
+    nmap <silent> <Leader>sw :FSHere<cr>
+
+
+    " >>
+    " 代码收藏
+
+    " 自定义 vim-signature 快捷键
+    let g:SignatureMap = {
+        \ 'Leader'             :  "m",
+        \ 'PlaceNextMark'      :  "m,",
+        \ 'ToggleMarkAtLine'   :  "m.",
+        \ 'PurgeMarksAtLine'   :  "m-",
+        \ 'DeleteMark'         :  "dm",
+        \ 'PurgeMarks'         :  "mda",
+        \ 'PurgeMarkers'       :  "m<BS>",
+        \ 'GotoNextLineAlpha'  :  "']",
+        \ 'GotoPrevLineAlpha'  :  "'[",
+        \ 'GotoNextSpotAlpha'  :  "`]",
+        \ 'GotoPrevSpotAlpha'  :  "`[",
+        \ 'GotoNextLineByPos'  :  "]'",
+        \ 'GotoPrevLineByPos'  :  "['",
+        \ 'GotoNextSpotByPos'  :  "mn",
+        \ 'GotoPrevSpotByPos'  :  "mp",
+        \ 'GotoNextMarker'     :  "[+",
+        \ 'GotoPrevMarker'     :  "[-",
+        \ 'GotoNextMarkerAny'  :  "]=",
+        \ 'GotoPrevMarkerAny'  :  "[=",
+        \ 'ListLocalMarks'     :  "ms",
+        \ 'ListLocalMarkers'   :  "m?"
+        \ }
+
+	" 让配置变更立即生效
+	autocmd BufWritePost $MYVIMRC source $MYVIMRC
+	" 查找
+	
+	" 使用 ctrlsf.vim 插件在工程内全局查找光标所在关键字，设置快捷键。快捷键速记法：search in project
+	nnoremap <Leader>sp :CtrlSF<CR>
+	
+	" 内容替换
+	
+	" 快捷替换
+	let g:multi_cursor_next_key='<S-n>'
+	let g:multi_cursor_skip_key='<S-k>'
+	
+	" 精准替换
+	" 替换函数。参数说明：
+	" confirm：是否替换前逐一确认
+	" wholeword：是否整词匹配
+	" replace：被替换字符串
+	function! Replace(confirm, wholeword, replawe)
+	    wa
+	    let flag = ''
+	    if a:confirm
+	        let flag .= 'gec'
+	    else
+	        let flag .= 'ge'
+	    endif
+	    let search = ''
+	    if a:wholeword
+	        let search .= '\<' . escape(expand('<cword>'), '/\.*$^~[') . '\>'
+	    else
+	        let search .= expand('<cword>')
+	    endif
+	    let replace = escape(a:replace, '/\&~')
+	    execute 'argdo %s/' . search . '/' . replace . '/' . flag . '| update'
+	endfunction
+	" 不确认、非整词
+	nnoremap <Leader>R :call Replace(0, 0, input('Replace '.expand('<cword>').' with: '))<CR>
+	" 不确认、整词
+	nnoremap <Leader>rw :call Replace(0, 1, input('Replace '.expand('<cword>').' with: '))<CR>
+	" 确认、非整词
+	nnoremap <Leader>rc :call Replace(1, 0, input('Replace '.expand('<cword>').' with: '))<CR>
+	" 确认、整词
+	nnoremap <Leader>rcw :call Replace(1, 1, input('Replace '.expand('<cword>').' with: '))<CR>
+	nnoremap <Leader>rwc :call Replace(1, 1, input('Replace '.expand('<cword>').' with: '))<CR>
+	" 由接口快速生成实现框架
+	
+	" 成员函数的实现顺序与声明顺序一致
+	let g:disable_protodef_sorting=1
+	
+	" 库信息参考
+	 
+	" 启用:Man命令查看各类man信息
+	source $VIMRUNTIME/ftplugin/man.vim
+	
+	" 定义:Man命令查看各类man信息的快捷键
+	nmap <Leader>man :Man 3 <cword><CR>
+    " 多文档编辑
+ 
+    " 显示/隐藏 MiniBufExplorer 窗口
+    map <Leader>bl :MBEToggle<cr>
+
+    " buffer 切换快捷键
+    map <C-Tab> :MBEbn<cr>
+    map <C-S-Tab> :MBEbp<cr>
+"	" 环境恢复
+"	
+"	" 设置环境保存项
+"	set sessionoptions="blank,globals,localoptions,tabpages,sesdir,folds,help,options,resize,winpos,winsize"
+"	
+"	" 保存 undo 历史。必须先行创建 .undo_history/
+"	set undodir=~/.undo_history/
+"	set undofile
+"	
+"	" 保存快捷键
+"	"map <leader>ss :mksession! my.vim<cr> :wviminfo! my.viminfo<cr>
+"	map <leader>ss :mksession! my.vim<cr>
+"	
+"	" 恢复快捷键
+"	"map <leader>rs :source my.vim<cr> :rviminfo my.viminfo<cr>
+"	map <leader>rs :source my.vim<cr>
+"	
+"	" 设置快捷键实现一键编译及运行
+"	nmap <Leader>m :wa<CR> :cd build/<CR> :!rm -rf main<CR> :!cmake CMakeLists.txt<CR>:make<CR><CR> :cw<CR> :cd ..<CR>
+"	nmap <Leader>g :wa<CR>:cd build/<CR>:!rm -rf main<CR>:!cmake CMakeLists.txt<CR>:make<CR><CR>:cw<CR>:cd ..<CR>:!build/main<CR>
+"	
+"	" 快速选中结对符内的文本
+"	 
+"	" 快捷键
+"	map <SPACE> <Plug>(wildfire-fuel)
+"	vmap <S-SPACE> <Plug>(wildfire-water)
+"	
+"	" 适用于哪些结对符
+"	let g:wildfire_objects = ["i'", 'i"', "i)", "i]", "i}", "i>", "ip"]
+"	
+"	" 调用 gundo 树
+"	nnoremap <Leader>ud :GundoToggle<CR>
+
 " }
 
 "Functions {
@@ -1293,7 +1453,7 @@ set shell=/bin/bash
     " }
 
 " }
-
+-
 " Other {
     """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     "file .c,.h,.sh,.java files,automatically insert the file header
@@ -1357,3 +1517,4 @@ set shell=/bin/bash
     "    exec "!gdb ./%<"
     "endfunc
 " }
+
